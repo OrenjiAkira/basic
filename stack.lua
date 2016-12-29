@@ -20,8 +20,12 @@ function stack:pop ()
   return item
 end
 
-function stack:__index (k)
-  return getmetatable(self)[k]
+function stack:is_empty ()
+  return self.head == 0
+end
+
+function stack:head ()
+  return self.stack[self.head]
 end
 
 return stack
