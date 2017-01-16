@@ -10,10 +10,10 @@ if not table.copy then
   table.copy = function (t)
     local u = {}
     for k, v in pairs(t) do
-      if type(t) ~= "table" then
-        u[k] = v
-      else
+      if type(v) == "table" then
         u[k] = table.copy(v)
+      else
+        u[k] = v
       end
     end
     return u

@@ -9,8 +9,8 @@ function stack:__init ()
 end
 
 function stack:push (item)
-  self.stack[self.head] = item
   self.head = self.head + 1
+  self.stack[self.head] = item
 end
 
 function stack:pop ()
@@ -24,7 +24,7 @@ function stack:is_empty ()
   return self.head == 0
 end
 
-function stack:head ()
+function stack:get_head ()
   return self.stack[self.head]
 end
 
