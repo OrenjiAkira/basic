@@ -75,7 +75,11 @@ function vector.__mul (l, r)
 end
 
 function vector.__pow (l, r)
-  -- body...
+  return -vector:new {
+    l[2] * r[3] - l[3] * r[2],
+    l[3] * r[1] - l[1] * r[3],
+    l[1] * r[2] - l[2] * r[1]
+  }
 end
 
 function vector.__div (l, r)
@@ -140,6 +144,10 @@ function vector:mul (f)
   self[1] = self[1] * f
   self[2] = self[2] * f
   self[3] = self[3] * f
+end
+
+function vector.angle (v, u, norad)
+  return (norad and 180/math.pi or 1) * math.acos( (v * u) / (v:size() * u:size()) )
 end
 
 return vector
