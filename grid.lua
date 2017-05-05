@@ -1,6 +1,7 @@
 
 local grid = require 'basic.prototype' :new {
   3, 3, 0,
+  unit = 32,
   __type = 'grid'
 }
 
@@ -37,12 +38,34 @@ function grid:get_height ()
   return self[2]
 end
 
+function grid:get_dimensions ()
+  return self[1], self[2]
+end
+
+function grid:get_unit ()
+  return self.unit
+end
+
+function grid:set_unit (u)
+  self.unit = u
+end
+
 function grid:get_base ()
   return self[3]
 end
 
 function grid:clear ()
   fill_grid(self.container)
+end
+
+function grid.new_from_table (t, u)
+  local m = grid:new { #t, #t[1], unit = u }
+  for i in ipairs(t) do
+    for j in ipairs(t[i]) do
+      m:set_cell(j, i, t[i][j])
+    end
+  end
+  return m
 end
 
 function grid:iterate ()
@@ -65,6 +88,15 @@ function grid:iterate ()
   end,
   init_s,
   0
+end
+
+function grid:__tostring ()
+  local s = "\n"
+  for x, y, value in self:iterate() do
+    s = s .. "[" .. x .. ", " .. y .. "]: " .. value .. "\n"
+  end
+  s = s .. "\n"
+  return s
 end
 
 return grid
