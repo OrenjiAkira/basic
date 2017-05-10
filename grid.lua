@@ -30,6 +30,11 @@ function grid:get_cell (x, y)
   return (self.container[x] or {})[y]
 end
 
+function grid:is_occupied (x, y)
+  local cell = self:get_cell()
+  return cell and cell ~= self:get_base()
+end
+
 function grid:get_width ()
   return self[1]
 end

@@ -1,6 +1,7 @@
 
 local vector = require 'basic.vector'
 local rect = require 'basic.rectangle'
+local unit = require 'basic.physics' .get_unit
 
 local dynamic_body = require 'basic.physics.collision_object' :new {
   0, 0, 0, 0,
@@ -92,7 +93,7 @@ function dynamic_body:move_as_close_as_possible ()
   local map = self:get_map()
   local bodylist = self:get_bodylist()
   local movement = self:get_movement()
-  local tries = logn(map:get_unit(), 2)
+  local tries = logn(get_unit(), 2)
   local pos, size = self:get_pos(), self:get_shape():get_size()
   local newrect = rect:new { pos.x, pos.y, size.x, size.y }
 
