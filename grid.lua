@@ -21,8 +21,8 @@ function grid:__init ()
 end
 
 function grid:set_cell (x, y, fill)
-  assert(self.container[x], "Invalid x pos: " .. y)
-  assert(self.container[x][y], "Invalid y pos: " .. x)
+  assert(self.container[x], "Invalid x pos: " .. x)
+  assert(self.container[x][y], "Invalid y pos: " .. y)
   self.container[x][y] = fill or 0
 end
 
@@ -63,10 +63,12 @@ function grid:clear ()
   fill_grid(self.container)
 end
 
-function grid.new_from_table (t, u)
-  local m = grid:new { #t, #t[1], unit = u }
+function grid.new_from_table (t)
+  local m = grid:new { #t[1], #t }
   for i in ipairs(t) do
     for j in ipairs(t[i]) do
+      print("row/y", i)
+      print("col/x", j)
       m:set_cell(j, i, t[i][j])
     end
   end

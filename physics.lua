@@ -33,7 +33,7 @@ end
 function physics.new_map (width, height)
   -- creates new map
   local map = grid:new { width, height }
-  table.insert(maps, map)
+  maps[map] = true
   return map
 end
 
