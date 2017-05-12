@@ -67,10 +67,20 @@ function grid.new_from_table (t)
   local m = grid:new { #t[1], #t }
   for i in ipairs(t) do
     for j in ipairs(t[i]) do
-      print("row/y", i)
-      print("col/x", j)
       m:set_cell(j, i, t[i][j])
     end
+  end
+  return m
+end
+
+function grid.new_from_vector (t, w)
+  local n = #t
+  local h = math.floor(n / w)
+  local m = grid:new { w, h }
+  for k = 1, n do
+    local x = (k - 1) % w + 1
+    local y = math.floor((k - 1) / w) + 1
+    m:set_cell(x, y, t[k])
   end
   return m
 end
