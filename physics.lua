@@ -45,7 +45,7 @@ function physics.new_map_from_table (t)
 end
 
 function physics.remove_map (map)
-  maps[map] = false
+  maps[map] = nil
 end
 
 function physics.new_body (map, x, y, w, h, layers, collision_layers)

@@ -66,7 +66,7 @@ end
 
 function collision_object:is_layer_colliding (other_obj)
   for n = 1, MAX_LAYERS do
-    if self:collides_with(n) and other_obj:is_in_layer(n) then
+    if self:collides_with_layer(n) and other_obj:is_in_layer(n) then
       return true
     end
   end

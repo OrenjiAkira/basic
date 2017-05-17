@@ -31,8 +31,8 @@ function grid:get_cell (x, y)
 end
 
 function grid:is_occupied (x, y)
-  local cell = self:get_cell()
-  return cell and cell ~= self:get_base()
+  local cell = self:get_cell(x, y)
+  return cell and cell ~= 0
 end
 
 function grid:get_width ()

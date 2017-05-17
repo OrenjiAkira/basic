@@ -21,7 +21,8 @@ function dynamic_body:get_shape ()
 end
 
 function dynamic_body:move (v)
-  self.movement:add(v)
+  self.pos:add(v)
+  self.movement:sub(v)
 end
 
 function dynamic_body:get_movement ()
@@ -29,9 +30,12 @@ function dynamic_body:get_movement ()
 end
 
 function dynamic_body:resolve_movement ()
+  -- if no movement, return
+  if self.movement:sqrlen() == 0 then return end
+
   if self:moveable() then
     -- if nothing is in the way, move
-    self:move_pos(self.movement)
+    self:move(self.movement)
   else
     -- if something is in the way, move as close to it as possible
     self:move_as_close_as_possible()
@@ -72,9 +76,6 @@ local function nobody_in_the_way (body, rectangle, bodylist)
 end
 
 function dynamic_body:moveable ()
-  -- if no movement, return
-  if self.movement:sqrlen() == 0 then return end
-
   -- if no map, error
   local map = self:get_map()
   assert(map, "Body's map is undefined. Create a map and set the body to it first.")
@@ -84,31 +85,26 @@ function dynamic_body:moveable ()
 
   -- get rectangle for new position
   local pos, size = self:get_pos(), self:get_shape():get_size()
-  local newrect = rect:new { pos.x + self.movement.x, pos.y + self.movement.y, size.x, size.y }
+  pos:add(self.movement)
+  local my_collision_box = rect:new { pos.x, pos.y, size.x, size.y }
 
-  return can_it_be_there(newrect, map) and nobody_in_the_way(self, newrect, bodylist)
+  return can_it_be_there(my_collision_box, map) and nobody_in_the_way(self, my_collision_box, bodylist)
 end
 
 function dynamic_body:move_as_close_as_possible ()
   local map = self:get_map()
   local bodylist = self:get_bodylist()
   local movement = self:get_movement()
-  local tries = logn(unit(), 2)
+  local tries = math.ceil(logn(unit(), 2))
   local pos, size = self:get_pos(), self:get_shape():get_size()
   local newrect = rect:new { pos.x, pos.y, size.x, size.y }
 
-  if tries > math.floor(tries) then
-    tries = math.floor(tries) + 1
-  else
-    tries = math.floor(tries)
-  end
-
   for n = 1, tries do
-    movement:mul(1 / (2 ^ n))
+    movement:mul(1 / 2 ^ n)
     local npos = self:get_pos() + movement
     newrect:set_pos(npos:unpack())
     if can_it_be_there(newrect, map) and nobody_in_the_way(self, newrect, bodylist) then
-      self:move_pos(movement)
+      self:move(movement)
     end
   end
 end
@@ -125,11 +121,11 @@ function dynamic_body:slide ()
   local ver_rect = rect:new { pos.x + vertical.x,   pos.y + vertical.y,   size.x, size.y }
 
   if can_it_be_there(hor_rect, map) and nobody_in_the_way(self, hor_rect, bodylist) then
-    self:move_pos(horizontal)
+    self:move(horizontal)
   end
 
   if can_it_be_there(ver_rect, map) and nobody_in_the_way(self, ver_rect, bodylist) then
-    self:move_pos(vertical)
+    self:move(vertical)
   end
 end
 
@@ -139,11 +135,6 @@ end
 
 function dynamic_body:set_pos (x, y)
   self.pos:set(x, y)
-end
-
-function dynamic_body:move_pos (v)
-  self.pos:add(v)
-  self.movement:sub(v)
 end
 
 function dynamic_body:get_pos ()
