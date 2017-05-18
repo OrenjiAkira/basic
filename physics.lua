@@ -54,7 +54,6 @@ function physics.new_body (map, x, y, w, h, layers, collision_layers)
   -- creates new body
   local body = modules.dynamic_body:new { x, y, w, h }
   body:set_map(map)
-  body:set_bodylist(bodies)
   body:set_layers(layers or { 1 })
   body:set_collision_layers(collision_layers or { 1 })
   bodies[body] = true

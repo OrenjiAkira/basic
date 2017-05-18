@@ -70,19 +70,6 @@ local function slide (body, movement)
   local y_move = movement:ycomp()
   move_as_close_as_possible (body, x_move)
   move_as_close_as_possible (body, y_move)
-
-  --local x_box = body:get_shape()
-  --local y_box = body:get_shape()
-  --x_box.pos:add(x_move)
-  --y_box.pos:add(y_move)
-
-  --if should_it_move(body, x_box) then
-  --  body:actualize_movement(x_move)
-  --end
-
-  --if should_it_move(body, y_box) then
-  --  body:actualize_movement(y_move)
-  --end
 end
 
 function movement.load (list_of_bodies, tile_size, collision_queue)
