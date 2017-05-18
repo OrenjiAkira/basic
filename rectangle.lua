@@ -49,18 +49,16 @@ function rect:get_border_points ()
   local points = {}
   local pos, size = self:get_pos(), self:get_size()
 
-  for dy = 0, math.floor(size.y) do
-    table.insert(points, vector:new { pos.x,          pos.y + dy })
-    table.insert(points, vector:new { pos.x + size.x, pos.y + dy })
+  local max_y = math.ceil(size.y)
+  for dy = 0, max_y do
+    table.insert(points, vector:new { pos.x,          pos.y + math.min(dy, size.y) })
+    table.insert(points, vector:new { pos.x + size.x, pos.y + math.min(dy, size.y) })
   end
 
-  for dx = 0, math.floor(size.x) do
-    table.insert(points, vector:new { pos.x + dx, pos.y })
-    table.insert(points, vector:new { pos.x + dx, pos.y + size.y })
-  end
-
-  if size.x ~= math.floor(size.x) or size.y ~= math.floor(size.y) then
-    table.insert(points, pos + size)
+  local max_x = math.ceil(size.x)
+  for dx = 1, max_x - 1 do
+    table.insert(points, vector:new { pos.x + math.min(dx, size.x), pos.y })
+    table.insert(points, vector:new { pos.x + math.min(dx, size.x), pos.y + size.y })
   end
 
   return points
