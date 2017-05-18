@@ -46,6 +46,10 @@ function collision_object:is_solid ()
   return self.solid
 end
 
+function collision_object:set_solid (enable)
+  self.solid = enable and true or false
+end
+
 function collision_object:set_layers (l)
   assert(type(l) == "table", "Invalid argument to 'set_layers'. Expected 'table', got " .. type(l))
   set_table_nums(self.layers, l)

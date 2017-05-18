@@ -6,6 +6,7 @@ local physics = {}
 local modules = require 'basic.pack' 'basic.physics'
 local iterate = require 'basic.iterate'
 local grid = require 'basic.grid'
+local queue = require 'basic.queue'
 
 local unit
 local maps
@@ -17,7 +18,8 @@ function physics.load (params)
   maps = {}
   bodies = {}
   unit = params.unit or 32
-  collisions = require 'basic.queue' :new { params.collisions or 4096 }
+  collisions = queue:new { params.collisions or 4096 }
+  modules.movement.load(bodies, unit)
 end
 
 function physics.get_unit ()
@@ -73,7 +75,8 @@ function physics.update ()
   collisions:clear()
   for body in pairs(bodies) do
     -- resolve movement
-    body:resolve_movement()
+    --body:resolve_movement()
+    modules.movement.resolve(body)
     -- resolve collisions
     for other in iterate.other(bodies) do
       if body:intersects_with(other) then
