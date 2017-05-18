@@ -59,6 +59,10 @@ function rect:get_border_points ()
     table.insert(points, vector:new { pos.x + dx, pos.y + size.y })
   end
 
+  if size.x ~= math.floor(size.x) or size.y ~= math.floor(size.y) then
+    table.insert(points, pos + size)
+  end
+
   return points
 end
 
