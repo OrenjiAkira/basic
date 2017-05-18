@@ -34,14 +34,6 @@ function collision_object:get_map ()
   return self.map
 end
 
-function collision_object:set_bodylist (b)
-  self.bodylist = b
-end
-
-function collision_object:get_bodylist ()
-  return self.bodylist
-end
-
 function collision_object:is_solid ()
   return self.solid
 end

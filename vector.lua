@@ -6,10 +6,6 @@ local vector = require 'basic.prototype' :new {
   __type = 'vector'
 }
 
-local X = vector:new { 1, 0, 0 }
-local Y = vector:new { 0, 1, 0 }
-local Z = vector:new { 0, 0, 1 }
-
 function vector:__index (k)
   if k == 'x' or k == 'j' then return self[1] end
   if k == 'y' or k == 'i' then return self[2] end
@@ -155,15 +151,19 @@ function vector.angle (v, u, norad)
 end
 
 function vector:xcomp ()
-  return vector:new { self * X, 0, 0 }
+  return vector:new { self[1], 0, 0 }
 end
 
 function vector:ycomp ()
-  return vector:new { 0, self * Y, 0 }
+  return vector:new { 0, self[2], 0 }
 end
 
 function vector:zcomp ()
-  return vector:new { 0, 0, self * Z }
+  return vector:new { 0, 0, self[3] }
+end
+
+function vector:comps ()
+  return self:xcomp(), self:ycomp(), self:zcomp()
 end
 
 return vector
