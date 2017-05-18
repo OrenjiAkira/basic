@@ -2,6 +2,7 @@
 local movement = {}
 local bodylist
 local unit
+local collisions
 
 local function can_it_be_there (rectangle, map)
   -- get points, check points
@@ -23,8 +24,11 @@ local function nobody_in_the_way (body, rectangle)
   local nobody = true
   for other in pairs(bodylist) do
     if body ~= other then
-      if rectangle:intersect(other:get_shape()) and body:is_layer_colliding(other) and other:is_solid() then
-        nobody = false
+      if rectangle:intersect(other:get_shape()) and body:is_layer_colliding(other) then
+        collisions:enqueue { body, other }
+        if other:is_solid() then
+          nobody = false
+        end
       end
     end
   end
@@ -79,9 +83,10 @@ local function slide (body, movement)
   end
 end
 
-function movement.load (list_of_bodies, box_size)
+function movement.load (list_of_bodies, tile_size, collision_queue)
   bodylist = list_of_bodies
-  unit = box_size
+  collisions = collision_queue
+  unit = tile_size
 end
 
 function movement.resolve (body)

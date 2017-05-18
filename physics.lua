@@ -19,7 +19,7 @@ function physics.load (params)
   bodies = {}
   unit = params.unit or 32
   collisions = queue:new { params.collisions or 4096 }
-  modules.movement.load(bodies, unit)
+  modules.movement.load(bodies, unit, collisions)
 end
 
 function physics.get_unit ()
@@ -75,19 +75,7 @@ function physics.update ()
   collisions:clear()
   for body in pairs(bodies) do
     -- resolve movement
-    --body:resolve_movement()
     modules.movement.resolve(body)
-    -- resolve collisions
-    for other in iterate.other(bodies) do
-      if body:intersects_with(other) then
-        if body:is_layer_colliding(other) then
-          collisions:enqueue { body, other }
-        end
-        if other:is_layer_colliding(body) then
-          collisions:enqueue { other, body }
-        end
-      end
-    end
   end
 end
 
