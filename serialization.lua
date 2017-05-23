@@ -221,9 +221,9 @@ local function serialize (t)
 
   -- append table metadata
   table_size = byte_int(#data)
-  print("table type", unsigned_char(table_type), bytes_to_hex(table_type))
-  print("table size", unsigned_int(table_size), bytes_to_hex(table_size))
-  print("table value", data, bytes_to_hex(data))
+  --print("table type", unsigned_char(table_type), bytes_to_hex(table_type))
+  --print("table size", unsigned_int(table_size), bytes_to_hex(table_size))
+  --print("table value", data, bytes_to_hex(data))
   data = table_type .. table_size .. data
 
   return data
@@ -236,10 +236,10 @@ local function read_slot (data)
   local data_type = read_data.type(data:sub(1, 1))
   local data_size = read_data.size(data:sub(2, 5))
   walked = walked + data_size
-  print("data type:", data_type)
-  print("data size:", data_size)
+  --print("data type:", data_type)
+  --print("data size:", data_size)
   data_value = read_data[data_type](data:sub(value_pos, walked - 1))
-  print("data value:", data_value, bytes_to_hex(data:sub(value_pos, walked - 1)))
+  --print("data value:", data_value, bytes_to_hex(data:sub(value_pos, walked - 1)))
 
   return data_type, data_size, data_value
 end
@@ -263,7 +263,7 @@ local function deserialize (data)
     t[key_value] = field_value
   end
 
-  print(t)
+  --print(t)
   return t
 end
 
@@ -286,24 +286,25 @@ assert(-65536 == signed_int(byte_int(-65536)), "TEST FAILED: SIGNED INT")
 assert(10.24 - signed_fixed(byte_fixed(10.24)) < EPSILON, "TEST FAILED: SIGNED FIXED")
 
 local binary_ver = serialize (sample_t)
-local reading
-local file = io.open('out.table', 'w') file:write(binary_ver) file:close()
-print("deserialize")
-file = io.open('out.table', 'r')
-reading = file:read("*a") file:close()
-print(bytes_to_hex(reading))
-local unbinary_ver = deserialize(reading)
+assert(binary_ver, "TEST FAILED: SERIALIZATION")
+local unbinary_ver = deserialize(binary_ver)
+assert(unbinary_ver, "TEST FAILED: DESERIALIZATION")
 
-local function f (t)
-  if type(t) ~= "table" then return t end
-  for k,v in pairs(t) do
-    print(f(k), f(v))
+local function compare(original, copy)
+  for k,v in pairs(original) do
+    if type(k) ~= "table" then
+      assert(copy[k] ~= nil, "TEST FAILED: PRESERIALIZED TABLE IS DIFFERENT THAN POSTSERIALIZED TABLE")
+      if type(v) ~= "table" then
+        assert(type(v) == type(copy[k]) and v == copy[k] or v - copy[k] < EPSILON,
+          "TEST FAILED: COPIED VALUE OF DESERIALIZED TABLE IS WRONG")
+      end
+    end
   end
-  return t
 end
-f(unbinary_ver)
+compare(sample_t, unbinary_ver)
 
 return {
   serialize = serialize,
   deserialize = deserialize
 }
+
