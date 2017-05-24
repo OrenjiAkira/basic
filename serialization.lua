@@ -160,12 +160,12 @@ local function serialize (t)
   assert(type(t) == "table", "Cannot serialize non-table value: " .. tostring(t))
 
   -- verify serialization requirements
-  if not is_serializeable(t) then return end
+  assert(is_serializeable(t), "WARNING: Attempt to serialize table with forbidden values or with recursive reference\n>>> " .. tostring(t))
 
   -- data to save
   local table_size
   local table_type = TYPE_TBL
-  local data = ""
+  local data = next(t) and "" or TYPE_TBL .. "\0\0\0\0"
 
   for key, field in pairs(t) do
     local type_k, type_f = type(key), type(field)
@@ -221,9 +221,6 @@ local function serialize (t)
 
   -- append table metadata
   table_size = byte_int(#data)
-  --print("table type", unsigned_char(table_type), bytes_to_hex(table_type))
-  --print("table size", unsigned_int(table_size), bytes_to_hex(table_size))
-  --print("table value", data, bytes_to_hex(data))
   data = table_type .. table_size .. data
 
   return data
@@ -236,9 +233,9 @@ local function read_slot (data)
   local data_type = read_data.type(data:sub(1, 1))
   local data_size = read_data.size(data:sub(2, 5))
   walked = walked + data_size
+  data_value = read_data[data_type](data:sub(value_pos, walked - 1))
   --print("data type:", data_type)
   --print("data size:", data_size)
-  data_value = read_data[data_type](data:sub(value_pos, walked - 1))
   --print("data value:", data_value, bytes_to_hex(data:sub(value_pos, walked - 1)))
 
   return data_type, data_size, data_value
