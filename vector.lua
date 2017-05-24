@@ -146,6 +146,12 @@ function vector:mul (f)
   self[3] = self[3] * f
 end
 
+function vector:floor()
+  self[1] = math.floor(self[1])
+  self[2] = math.floor(self[2])
+  self[3] = math.floor(self[3])
+end
+
 function vector.angle (v, u, norad)
   return (norad and 180/math.pi or 1) * math.acos( (v * u) / (v:size() * u:size()) )
 end
