@@ -31,11 +31,3 @@ if not table.find then
   end
 end
 
--- serialize in pure data
-if not table.serialize then
-  table.serialize = require 'basic.serialization' .serialize
-end
-
-if not table.deserialize then
-  table.deserialize = require 'basic.serialization' .deserialize
-end
