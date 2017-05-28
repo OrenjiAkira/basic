@@ -65,9 +65,9 @@ function vector.__mul (l, r)
     return mul_by_scalar(l, r)
   elseif r:get_type() == 'matrix' then
     return vector:new {
-      l[1] * (r[1][1] + r[1][2] + r[1][3]),
-      l[2] * (r[2][1] + r[2][2] + r[2][3]),
-      l[3] * (r[3][1] + r[3][2] + r[3][3])
+      l[1] * r[1][1] + l[2] * r[1][2] + l[3] * r[1][3],
+      l[1] * r[2][1] + l[2] * r[2][2] + l[3] * r[2][3],
+      l[1] * r[3][1] + l[2] * r[3][2] + l[3] * r[3][3]
     }
   else
     return scalar_product(l, r)
