@@ -3,20 +3,26 @@
 local timer = require 'basic.prototype' :new {
   target = 1,
   loop = 1,
-  handle_frame = function () end,
+  handle_frame = function (dt) end,
   handle_period = function () end,
   __type = 'timer'
 }
 
+local timeunit = 1
+
 function timer:__init ()
+  self.target = self.target * timeunit
   self.update = coroutine.create(self.routine)
 end
 
-function timer:routine ()
+function timer:routine (dt)
   while self.loop > 0 or self.loop == -1 do
-    for i = 1, self.target do
-      self.handle_frame()
-      coroutine.yield()
+    local count = 0
+    while count < self.target do
+      self.handle_frame(dt)
+      count = count + dt * timeunit
+      print("It has been:", count / timeunit)
+      self, dt = coroutine.yield()
     end
     self.handle_period()
     self.loop = self.loop == -1 and -1 or self.loop -1
@@ -25,21 +31,15 @@ end
 
 -- timer manager
 local timer_manager = require 'basic.prototype' :new {
-  framerate = 60,
   __type = 'timer_manager'
 }
 
 function timer_manager:__init ()
   self.timers = {}
-  self.framerate = math.floor(self.framerate)
-end
-
-function timer_manager:setfps (fps)
-  self.framerate = math.floor(fps)
 end
 
 function timer_manager:clear ()
-  for id,_ in pairs(self.timers) do
+  for id in pairs(self.timers) do
     self.timers[id] = nil
   end
 end
@@ -49,9 +49,9 @@ function timer_manager:cancel (t)
   self.timers[t] = nil
 end
 
-function timer_manager:update ()
+function timer_manager:update (dt)
   for t in pairs(self.timers) do
-    local unfinished, status = coroutine.resume(t.update, t)
+    local unfinished, status = coroutine.resume(t.update, t, dt)
     --if status then print(status) end
     if not unfinished then
       self.timers[t] = nil
@@ -63,7 +63,7 @@ function timer_manager:after (s, func)
   assert(s > 0, "Must give a positive time in seconds as first argument.")
   assert(type(func)=='function', "Must give a valid function as second argument.")
   local t = timer:new {
-    target = s * self.framerate,
+    target = s,
     handle_period = func,
   }
   self.timers[t] = t
@@ -74,7 +74,7 @@ function timer_manager:every (s, func, times)
   assert(s > 0, "Must give a positive time in seconds as first argument.")
   assert(type(func)=='function', "Must give a valid function as second argument.")
   local t = timer:new {
-    target = s * self.framerate,
+    target = s,
     handle_period = func,
     loop = times or -1,
   }
@@ -86,7 +86,7 @@ function timer_manager:during (s, func_during, func_after)
   assert(s > 0, "Must give a positive time in seconds as first argument.")
   assert(type(func_during)=='function', "Must give a valid function as second argument.")
   local t = timer:new {
-    target = s * self.framerate,
+    target = s,
     handle_frame = func_during,
     handle_period = func_after or function () end,
   }
@@ -95,3 +95,4 @@ function timer_manager:during (s, func_during, func_after)
 end
 
 return timer_manager:new {}
+
