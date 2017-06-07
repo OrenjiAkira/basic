@@ -21,7 +21,6 @@ function timer:routine (dt)
     while count < self.target do
       self.handle_frame(dt)
       count = count + dt * timeunit
-      print("It has been:", count / timeunit)
       self, dt = coroutine.yield()
     end
     self.handle_period()
