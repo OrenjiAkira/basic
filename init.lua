@@ -1,6 +1,8 @@
 
 local path = ...
 
+assert(path, "Do not call init directly from lua, use require.")
+
 if path ~= "basic" then
   path = path:match("(.+)[.]basic")
   assert(path, "Cannot require basiclib from basic dir")
