@@ -1,5 +1,5 @@
 
-local vector = require 'basic.vector'
+local Vector = require 'basic.vector'
 local Matrix = require 'basic.prototype' :new {
   { 1, 0, 0 },
   { 0, 1, 0 },
@@ -8,9 +8,9 @@ local Matrix = require 'basic.prototype' :new {
 }
 
 function Matrix:__init ()
-  self[1] = vector:new(self[1])
-  self[2] = vector:new(self[2])
-  self[3] = vector:new(self[3])
+  self[1] = Vector:new(self[1])
+  self[2] = Vector:new(self[2])
+  self[3] = Vector:new(self[3])
 end
 
 function Matrix:setCell (i, j, fill)
@@ -67,8 +67,8 @@ function Matrix.__mul (l, r)
     for i, j, val in Matrix.iterate(l) do
       l:setCell(i, j, val * r)
     end
-  elseif r:getType() == 'vector' then
-    return error("Cannot multiply 3x3 Matrix by 1x3 vector. Did you mean to multiply 1x3 vector by 3x3 Matrix?")
+  elseif r:getType() == 'Vector' then
+    return error("Cannot multiply 3x3 Matrix by 1x3 Vector. Did you mean to multiply 1x3 Vector by 3x3 Matrix?")
   else
     return matrix_multiplication(l, r)
   end
