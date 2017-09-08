@@ -1,5 +1,5 @@
 
-local Movement = {}
+local Mover = {}
 
 local _bodylist
 local _unit
@@ -73,13 +73,13 @@ local function _slide (body, movement)
   _moveAsCloseAsPossible (body, y_move)
 end
 
-function movement.load (list_of_bodies, tile_size, collision_queue)
+function Mover.load (list_of_bodies, tile_size, collision_queue)
   _bodylist = list_of_bodies
   _collisions = collision_queue
   _unit = tile_size
 end
 
-function movement.resolve (body)
+function Mover.resolve (body)
   local movement = body:getMovement()
 
   -- if no movement, return
@@ -102,4 +102,4 @@ function movement.resolve (body)
   body:resetMovement()
 end
 
-return movement
+return Mover

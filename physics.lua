@@ -2,8 +2,8 @@
 require 'basic.tableutility'
 require 'basic.logarithm'
 
-local MOVEMENT = require 'physics.movement'
-local DynamicBody = require 'physics.dynamic_body'
+local Mover = require 'basic.physics.mover'
+local DynamicBody = require 'basic.physics.dynamic_body'
 local Grid = require 'basic.grid'
 local Queue = require 'basic.queue'
 
@@ -20,7 +20,7 @@ function Physics.load (params)
   _bodies = {}
   _unit = params.unit or 32
   _collisions = Queue:new { params.max_collisions or 4096 }
-  MOVEMENT.load(_bodies, _unit, _collisions)
+  Mover.load(_bodies, _unit, _collisions)
 end
 
 function Physics.getUnit ()
@@ -79,7 +79,7 @@ function Physics.update ()
   _collisions:clear()
   for body in pairs(_bodies) do
     -- resolve movement
-    MOVEMENT.resolve(body)
+    Mover.resolve(body)
   end
 end
 

@@ -1,6 +1,6 @@
 
 local unique = require 'basic.prototype':new {
-  nextID = 0
+  nextID = 0,
   __type = 'unique'
 }
 

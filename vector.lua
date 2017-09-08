@@ -82,7 +82,7 @@ function Vector.__div (l, r)
   if type(r) == 'number' then
     return _multByNumber(l, 1.0/r)
   else
-    return error(("Can't divide %s by %s"):format(, type(l), type(r)))
+    return error(("Can't divide %s by %s"):format(type(l), type(r)))
   end
 end
 
