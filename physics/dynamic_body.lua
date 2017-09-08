@@ -1,56 +1,55 @@
 
-local vector = require 'basic.vector'
-local rect = require 'basic.rectangle'
-local unit = require 'basic.physics' .get_unit
+local Vector = require 'basic.vector'
+local Rect = require 'basic.rectangle'
 
-local dynamic_body = require 'basic.physics.collision_object' :new {
+local DynamicBody = require 'basic.physics.collision_object' :new {
   0, 0, 0, 0,
-  __type = 'dynamic_body',
+  __type = 'DynamicBody',
 }
 
-function dynamic_body:__init ()
-  self.shape = rect:new {
+function DynamicBody:__init ()
+  self.shape = Rect:new {
     self[1], self[2], self[3], self[4]
   }
   self.pos = self.shape.pos -- i want the pointer to be the same
-  self.movement = require 'basic.vector' :new {}
+  self.movement = Vector:new {}
 end
 
-function dynamic_body:get_shape ()
-  return self.shape:clone()
+function DynamicBody:getShape ()
+  return Rect:new { self.shape:unpack() }
 end
 
-function dynamic_body:actualize_movement (v)
+function DynamicBody:actualizeMovement (v)
   self.pos:add(v)
   self.movement:sub(v)
 end
 
-function dynamic_body:reset_movement ()
+function DynamicBody:resetMovement ()
   self.movement:set()
 end
 
-function dynamic_body:move (v)
+function DynamicBody:move (v)
   self.movement:add(v)
 end
 
-function dynamic_body:get_movement ()
+function DynamicBody:getMovement ()
   return self.movement * 1
 end
 
-function dynamic_body:intersects_with (body)
-  return self:get_shape():intersect(body:get_shape())
+function DynamicBody:intersectsWith (body)
+  return self:getShape():intersect(body:getShape())
 end
 
-function dynamic_body:set_pos (x, y)
+function DynamicBody:setPos (x, y)
   self.pos:set(x, y)
 end
 
-function dynamic_body:get_pos ()
-  return self.pos * 1
+function DynamicBody:getPos ()
+  return self.pos:unpack(1, 2)
 end
 
-function dynamic_body:get_center ()
-  return self.pos + self.shape:get_size() / 2
+function DynamicBody:getCenter ()
+  return self.pos + self.shape:getSize() / 2
 end
 
-return dynamic_body
+return DynamicBody

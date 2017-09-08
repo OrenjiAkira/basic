@@ -1,6 +1,6 @@
 
 -- MODULES --
-local BYTE = {}
+local Byte = {}
 local _transform = {}
 local _translate = {}
 
@@ -200,7 +200,7 @@ local function _isValidForSerialization(t, list)
   list = list or {}
 
   -- manage table list for protection against infinite recursion
-  if list[t] then success = false end
+  if list[t] then return false, err end
   list[t] = true
 
   -- verify table fields
@@ -219,13 +219,14 @@ local function _isValidForSerialization(t, list)
 
     -- verify nested tables recursively
     if ktype == "table" then
-      success = _isValidForSerialization(key, {unpack(list)})
+      success = _isValidForSerialization(key, list)
     end
     if vtype == "table" then
-      success = _isValidForSerialization(value, {unpack(list)})
+      success = _isValidForSerialization(value, list)
     end
   end
 
+  list[t] = nil
   -- return success or failure
   return success
 end
@@ -240,7 +241,7 @@ function _serialize(value)
   local t = _getTypeChar(value)
   local type_name = _getTypeName(t)
   -- if table, call recursively
-  if type_name == "table" then return BYTE.serialize(value) end
+  if type_name == "table" then return Byte.serialize(value) end
 
   -- else, carry on as normal
   local length = TYPE_SIZE[type_name] or #value
@@ -250,7 +251,7 @@ function _serialize(value)
   return t..s..content, length
 end
 
-function BYTE.serialize(tbl)
+function Byte.serialize(tbl)
   assert(_isValidForSerialization(tbl))
 
   local content = ""
@@ -272,7 +273,7 @@ end
 function _deserialize(str)
   local type_name = _getTypeName(str:sub(1,1))
   -- if table, call recursively
-  if type_name == "table" then return BYTE.deserialize(str) end
+  if type_name == "table" then return Byte.deserialize(str) end
 
   -- carry on
   local tail = 2 + TYPE_SIZE.integer
@@ -282,7 +283,7 @@ function _deserialize(str)
   return value, length
 end
 
-function BYTE.deserialize(str)
+function Byte.deserialize(str)
   local type_name = _getTypeName(str:sub(1,1))
   assert(type_name == "table", "Invalid data to deserialize")
   local tbl = {}
@@ -301,5 +302,5 @@ function BYTE.deserialize(str)
   return tbl, length
 end
 
-return BYTE
+return Byte
 

@@ -1,7 +1,7 @@
 
 -- logarithm
 
-local function basen (n, b)
+function math.basen (n, b)
   n = math.floor(n)
   if not b or b == 10 then return tostring(n) end
   local digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -19,6 +19,6 @@ local function basen (n, b)
   return sign .. table.concat(t,"")
 end
 
-function logn (n, b)
+function math.logn (n, b)
   return math.log10(basen(n, b), b)
 end

@@ -1,37 +1,37 @@
 
 local vector = require 'basic.vector'
-local matrix = require 'basic.prototype' :new {
+local Matrix = require 'basic.prototype' :new {
   { 1, 0, 0 },
   { 0, 1, 0 },
   { 0, 0, 1 },
-  __type = 'matrix'
+  __type = 'Matrix'
 }
 
-function matrix:__init ()
+function Matrix:__init ()
   self[1] = vector:new(self[1])
   self[2] = vector:new(self[2])
   self[3] = vector:new(self[3])
 end
 
-function matrix:set_cell (i, j, fill)
+function Matrix:setCell (i, j, fill)
   assert(self[i], "Invalid row: " .. i)
   assert(self[i][j], "Invalid column: " .. j)
   self[i][j] = fill or 0
 end
 
-function matrix:get_cell (i, j)
+function Matrix:getCell (i, j)
   local dummy = {}
   return (self[i] or dummy)[j]
 end
 
-function matrix:determinant ()
+function Matrix:determinant ()
   return self[1][1] * (self[2][2] * self[3][3] - self[2][3] * self[3][2]) -
          self[1][2] * (self[2][1] * self[3][3] - self[2][3] * self[3][1]) +
          self[1][3] * (self[2][1] * self[3][2] - self[2][2] * self[3][1])
 end
 
-function matrix:transpose ()
-  return matrix:new {
+function Matrix:transpose ()
+  return Matrix:new {
     { self[1][1], self[2][1], self[3][1] },
     { self[1][2], self[2][2], self[3][2] },
     { self[1][3], self[2][3], self[3][3] },
@@ -39,7 +39,7 @@ function matrix:transpose ()
 end
 
 local function matrix_multiplication(a, b)
-  return matrix:new {
+  return Matrix:new {
     {
       a[1][1] * b[1][1] + a[1][2] * b[2][1] + a[1][3] * b[3][1],
       a[1][1] * b[1][2] + a[1][2] * b[2][2] + a[1][3] * b[3][2],
@@ -58,30 +58,30 @@ local function matrix_multiplication(a, b)
   }
 end
 
-function matrix.__mul (l, r)
+function Matrix.__mul (l, r)
   if type(l) == 'number' then
-    for i, j, val in matrix.iterate(r) do
-      r:set_cell(i, j, val * r)
+    for i, j, val in Matrix.iterate(r) do
+      r:setCell(i, j, val * r)
     end
   elseif type(r) == 'number' then
-    for i, j, val in matrix.iterate(l) do
-      l:set_cell(i, j, val * r)
+    for i, j, val in Matrix.iterate(l) do
+      l:setCell(i, j, val * r)
     end
-  elseif r:get_type() == 'vector' then
-    return error("Cannot multiply 3x3 matrix by 1x3 vector. Did you mean to multiply 1x3 vector by 3x3 matrix?")
+  elseif r:getType() == 'vector' then
+    return error("Cannot multiply 3x3 Matrix by 1x3 vector. Did you mean to multiply 1x3 vector by 3x3 Matrix?")
   else
     return matrix_multiplication(l, r)
   end
 end
 
-function matrix:__tostring ()
+function Matrix:__tostring ()
   return "Matrix {\n" ..
     '  ' .. self[1][1] .. ' ' .. self[1][2] .. ' ' .. self[1][3] .. '\n' ..
     '  ' .. self[2][1] .. ' ' .. self[2][2] .. ' ' .. self[2][3] .. '\n' ..
     '  ' .. self[3][1] .. ' ' .. self[3][2] .. ' ' .. self[3][3] .. '\n}'
 end
 
-function matrix:iterate ()
+function Matrix:iterate ()
   local init_s = { 1, 0, tbl = self }
   return function(s, value)
     local m = s.tbl
@@ -103,4 +103,4 @@ function matrix:iterate ()
   0
 end
 
-return matrix
+return Matrix

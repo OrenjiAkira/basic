@@ -15,3 +15,4 @@ return function (path)
   setmetatable(package, package_mt)
   return package
 end
+

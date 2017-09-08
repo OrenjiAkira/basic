@@ -1,15 +1,14 @@
 
 local unique = require 'basic.prototype':new {
+  nextID = 0
   __type = 'unique'
 }
 
-function unique:__init ()
-  self.next = 0
-end
+local FMT = "#%d"
 
 function unique:generate ()
-  self.next = self.next + 1
-  return self.next
+  self.nextID = self.nextID + 1
+  return string.format(FMT, self.nextID)
 end
 
 return unique:new {}

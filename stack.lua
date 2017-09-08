@@ -1,31 +1,32 @@
 
-local stack = require 'basic.prototype' :new {
-  __type = 'stack'
+local Stack = require 'basic.prototype' :new {
+  __type = 'Stack'
 }
 
-function stack:__init ()
-  self.stack = {}
+function Stack:__init ()
+  self.list = {}
   self.head = 0
 end
 
-function stack:push (item)
+function Stack:push (item)
   self.head = self.head + 1
-  self.stack[self.head] = item
+  self.list[self.head] = item
 end
 
-function stack:pop ()
-  local item = self.stack[self.head]
-  self.stack[self.head] = nil
+function Stack:pop ()
+  local item = self.list[self.head]
+  self.list[self.head] = nil
   self.head = self.head - 1
   return item
 end
 
-function stack:is_empty ()
+function Stack:isEmpty ()
   return self.head == 0
 end
 
-function stack:get_head ()
-  return self.stack[self.head]
+function Stack:getHead ()
+  return self.list[self.head]
 end
 
-return stack
+return Stack
+

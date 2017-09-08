@@ -1,18 +1,19 @@
 
-local movement = {}
-local bodylist
-local unit
-local collisions
+local Movement = {}
 
-local function can_it_be_there (rectangle, map)
+local _bodylist
+local _unit
+local _collisions
+
+local function _canItBeThere (rectangle, map)
   -- get points, check points
   local yes = true
-  local points = rectangle:get_border_points()
+  local points = rectangle:getBorderPoints()
 
   for n = 1, #points do
     local point = points[n]
     local x, y = math.floor(point.x), math.floor(point.y)
-    if map:is_occupied(x, y) then
+    if map:isOccupied(x, y) then
       yes = false
     end
   end
@@ -20,13 +21,13 @@ local function can_it_be_there (rectangle, map)
   return yes
 end
 
-local function nobody_in_the_way (body, rectangle)
+local function _nobodyInTheWay (body, rectangle)
   local nobody = true
-  for other in pairs(bodylist) do
+  for other in pairs(_bodylist) do
     if body ~= other then
-      if rectangle:intersect(other:get_shape()) and body:is_layer_colliding(other) then
-        collisions:enqueue { body, other }
-        if other:is_solid() then
+      if rectangle:intersect(other:getShape()) and body:isLayerColliding(other) then
+        _collisions:push { body, other }
+        if other:isSolid() then
           nobody = false
         end
       end
@@ -35,70 +36,70 @@ local function nobody_in_the_way (body, rectangle)
   return nobody
 end
 
-local function should_it_move (body, collision_box)
+local function _shouldItMove (body, collision_box)
   -- get map; if no map, error
-  local map = body:get_map()
+  local map = body:getMap()
   assert(map, "Body's map is undefined. Create a map and set the body to it first.")
 
-  return can_it_be_there(collision_box, map) and nobody_in_the_way(body, collision_box)
+  return _canItBeThere(collision_box, map) and _nobodyInTheWay(body, collision_box)
 end
 
-local function is_moveable (body, movement)
+local function _isMoveable (body, movement)
   -- get rectangle for new position
-  local collision_box = body:get_shape()
+  local collision_box = body:getShape()
   collision_box.pos:add(movement)
 
-  return should_it_move (body, collision_box)
+  return _shouldItMove (body, collision_box)
 end
 
-local function move_as_close_as_possible (body, movement)
-  local tries = math.ceil(logn(unit, 2))
-  local collision_box = body:get_shape()
+local function _moveAsCloseAsPossible (body, movement)
+  local tries = math.ceil(logn(_unit, 2))
+  local collision_box = body:getShape()
 
   for n = 1, tries do
     movement:mul(1 / 2 ^ n)
-    local npos = body:get_pos() + movement
-    collision_box:set_pos(npos:unpack())
-    if should_it_move(body, collision_box) then
-      body:actualize_movement(movement)
+    local npos = body:getPos() + movement
+    collision_box:setPos(npos:unpack())
+    if _shouldItMove(body, collision_box) then
+      body:actualizeMovement(movement)
     end
   end
 end
 
-local function slide (body, movement)
+local function _slide (body, movement)
   local x_move = movement:xcomp()
   local y_move = movement:ycomp()
-  move_as_close_as_possible (body, x_move)
-  move_as_close_as_possible (body, y_move)
+  _moveAsCloseAsPossible (body, x_move)
+  _moveAsCloseAsPossible (body, y_move)
 end
 
 function movement.load (list_of_bodies, tile_size, collision_queue)
-  bodylist = list_of_bodies
-  collisions = collision_queue
-  unit = tile_size
+  _bodylist = list_of_bodies
+  _collisions = collision_queue
+  _unit = tile_size
 end
 
 function movement.resolve (body)
-  local movement = body:get_movement()
+  local movement = body:getMovement()
 
   -- if no movement, return
   if movement:sqrlen() == 0 then return end
 
   -- check if nothing is in the way
-  if is_moveable(body, movement) then
+  if _isMoveable(body, movement) then
     -- nothing in the way; move, you little shit
-    body:actualize_movement(movement)
+    body:actualizeMovement(movement)
   else
     -- if something is in the way, move as close to it as possible
-    move_as_close_as_possible(body, movement)
+    _moveAsCloseAsPossible(body, movement)
     -- update movement
-    movement = body:get_movement()
+    movement = body:getMovement()
     -- if movement is not finished, slide
-    slide(body, movement)
+    _slide(body, movement)
   end
 
   -- finally, reset movement
-  body:reset_movement()
+  body:resetMovement()
 end
 
 return movement

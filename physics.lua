@@ -2,80 +2,86 @@
 require 'basic.tableutility'
 require 'basic.logarithm'
 
-local physics = {}
-local modules = require 'basic.pack' 'basic.physics'
-local iterate = require 'basic.iterate'
-local grid = require 'basic.grid'
-local queue = require 'basic.queue'
+local MOVEMENT = require 'physics.movement'
+local DynamicBody = require 'physics.dynamic_body'
+local Grid = require 'basic.grid'
+local Queue = require 'basic.queue'
 
-local unit
-local maps
-local bodies
-local collisions
+local Physics = {}
 
-function physics.load (params)
+local _unit
+local _maps
+local _bodies
+local _collisions
+
+function Physics.load (params)
   params = params or {}
-  maps = {}
-  bodies = {}
-  unit = params.unit or 32
-  collisions = queue:new { params.collisions or 4096 }
-  modules.movement.load(bodies, unit, collisions)
+  _maps = {}
+  _bodies = {}
+  _unit = params.unit or 32
+  _collisions = Queue:new { params.max_collisions or 4096 }
+  MOVEMENT.load(_bodies, _unit, _collisions)
 end
 
-function physics.get_unit ()
+function Physics.getUnit ()
   -- get unit
-  return unit
+  return _unit
 end
 
-function physics.set_unit (u)
+function Physics.setUnit (u)
   -- set unit
-  unit = u
+  _unit = u
 end
 
-function physics.new_map (width, height)
+function Physics.newMap (width, height)
   -- creates new map
-  local map = grid:new { width, height }
-  maps[map] = true
+  local map = Grid:new { width, height }
+  _maps[map] = true
   return map
 end
 
-function physics.new_map_from_table (t)
+function Physics.newMapFromTable (t)
   -- creates new map from table
-  local map = grid.new_from_table(t)
-  maps[map] = true
+  local map = Grid.newFromTable(t)
+  _maps[map] = true
   return map
 end
 
-function physics.remove_map (map)
-  maps[map] = nil
+function Physics.removeMap (map)
+  _maps[map] = nil
 end
 
-function physics.new_body (map, x, y, w, h, layers, collision_layers)
+function Physics.newBody (map, x, y, w, h, layers, collision_layers)
   -- creates new body
-  local body = modules.dynamic_body:new { x, y, w, h }
-  body:set_map(map)
-  body:set_layers(layers or { 1 })
-  body:set_collision_layers(collision_layers or { 1 })
-  bodies[body] = true
+  local body = DynamicBody:new { x, y, w, h }
+  body:setMap(map)
+  body:setLayers(layers or { 1 })
+  body:setCollisionLayers(collision_layers or { 1 })
+  _bodies[body] = true
   return body
 end
 
-function physics.remove_body (body)
+function Physics.removeBody (body)
   -- removes body
-  bodies[body] = nil
+  _bodies[body] = nil
 end
 
-function physics.get_next_collision ()
-  -- pops and returns collision from collision queue
-  return collisions:dequeue()
+function Physics.getCollisions ()
+  -- pops and returns collisions from collision Queue
+  local col_list = {}
+  while not _collisions:isEmpty() do
+    table.insert(col_list, _collisions:pop())
+  end
+  return col_list
 end
 
-function physics.update ()
-  collisions:clear()
-  for body in pairs(bodies) do
+function Physics.update ()
+  _collisions:clear()
+  for body in pairs(_bodies) do
     -- resolve movement
-    modules.movement.resolve(body)
+    MOVEMENT.resolve(body)
   end
 end
 
-return physics
+return Physics
+

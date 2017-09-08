@@ -34,7 +34,7 @@ function prototype:clone ()
   return clone
 end
 
-function prototype:get_type (args)
+function prototype:getType (args)
   return self.__type
 end
 

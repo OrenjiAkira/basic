@@ -1,54 +1,63 @@
 
-local queue = require 'basic.prototype' :new {
+local Queue = require 'basic.prototype' :new {
   256, -- basic size
-  true, -- whether it worries about overflows
-  __type = 'queue'
+  __type = 'Queue'
 }
 
-function queue:__init ()
+
+function Queue:__init ()
 
   -- queue attributes (intern use only, please, unless you REALLY know what you're doing)
-  self.queue = {}
+  self.list = {}
   self.head = 1
   self.tail = 1
-  self.size = self[1]
-  self.overflow = self[2]
+  self.size = 0
+  self.max = self[1]
 
   self:clear()
 end
 
-function queue:clear ()
+function Queue:clear ()
   -- allocating all of the queue in the same space for performance
-  for i = 1, self.size do self.queue[i] = false end
+  for i = 1, self.max do self.list[i] = false end
   self.tail = self.head
+  self.size = 0
 end
 
-function queue:is_empty ()
-  return self.tail == self.head
+function Queue:first()
+  return self.list[self.head]
 end
 
-function queue:enqueue (item)
-  self.queue[self.tail] = item
-  self.tail = self.tail % self.size + 1
-  if self.overflow then
-    assert(self.tail ~= self.head, "Queue overflow. Use a larger sized queue (currently is " .. tostring(self.size) .. ").")
-  end
+function Queue:isEmpty()
+  return self.size == 0
 end
 
-function queue:dequeue ()
-  if self:is_empty() then return end
-  local item = self.queue[self.head]
-  self.queue[self.head] = false
-  self.head = self.head % self.size + 1
+function Queue:isFull()
+  return self.size == self.max
+end
+
+function Queue:push(item)
+  assert(not self:isFull(),
+    ("Queue overflow. (Max size is %d)"):format(self.max))
+  self.list[self.tail] = item
+  self.tail = self.tail % self.max + 1
+  self.size = self.size + 1
+end
+
+function Queue:pop()
+  assert(not self:isEmpty(),
+    "Cannot pop empty queue.")
+  local item = self.list[self.head]
+  self.list[self.head] = false
+  self.head = self.head % self.max + 1
+  self.size = self.size - 1
   return item
 end
 
-function queue:__tostring ()
-  local s = "== Queue == \n"-- body...
-  s = s .. "> SIZE: " .. self.size .. "\n"
-  s = s .. "> HEAD: #" .. self.head .. ", value: " .. tostring(self.queue[self.head]) .. "\n"
-  s = s .. "> TAIL: #" .. self.tail .. ", value: " .. tostring(self.queue[self.tail]) .. "\n"
+function Queue:__tostring ()
+  local s = ("Queue: SIZE %d, NEXT %s"):format(self.size, self:first())
   return s
 end
 
-return queue
+return Queue
+
